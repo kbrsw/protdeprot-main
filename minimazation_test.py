@@ -35,8 +35,25 @@ def optfunc(x):
     op2 = abs(x[0]-x[1]-5)
     return (op1,op2)
 
-optxy = root(optfunc,(xin[0],yin[0]))
+optxy = fsolve(optfunc,(xin,yin))
 print(optxy)
 
-diff= optxy.x[0]-optxy.x[1]
-print(diff)
+residue1 = optxy[0]-optxy[1]-5
+print("new residue = ", residue1)
+
+#----- found new A and B that agree optimized X and Y
+
+def fA(A):
+    eq1A = A*optxy[0]-5
+    return eq1A
+
+def fB(y):
+    eq2B = B*optxy[1]+6
+    return eq2B
+
+An = fsolve(fA, A)
+Bn = fsolve(fB, B)
+
+print("new A = ", An)
+print("new B = ", Bn)
+
