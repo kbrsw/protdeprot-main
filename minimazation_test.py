@@ -29,6 +29,7 @@ diffM = 5
 residue = diffCalc-diffM
 print("residue = ", residue)
 
+
 # ---- Optimizing X and Y takin into account conditions and given difference between
 def optfunc(x):
     op1 = abs(xin[0]-yin[0]-x[0]+x[1])
@@ -40,6 +41,8 @@ print(optxy)
 
 residue1 = optxy[0]-optxy[1]-5
 print("new residue = ", residue1)
+
+residue = residue1 # !!! give another name that we use in cycling
 
 #----- found new A and B that agree optimized X and Y
 
@@ -57,3 +60,5 @@ Bn = fsolve(fB, B)
 print("new A = ", An)
 print("new B = ", Bn)
 
+A = An
+B = Bn
