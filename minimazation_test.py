@@ -4,7 +4,7 @@ import mpmath
 import math
 from scipy.optimize import minimize, basinhopping, leastsq, fsolve, root
 
-# ---Initial guess for A and B
+# ---Give initial guess for A and B
 A = 2
 B = 1
 
