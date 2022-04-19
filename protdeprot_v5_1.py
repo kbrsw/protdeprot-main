@@ -97,7 +97,7 @@ while abs(residue) > 1e-19:
 
     # optParA = minimize(f1, (Aain, Kain), method='Powell', bounds=(boundAa, boundKa))
     # optParB = minimize(f2, (Abin, Kbin), method='Powell', bounds=(boundAb, boundKb))
-    rranges = (slice(1, 3000, 0.1), slice(1e-13, 1e-3, 1e-3))
+    rranges = (slice(1, 3000, 0.1), slice(1e-13, 1e-3, 1e-2))
     optParA = brute(f1, rranges, full_output=True)
     optParB = brute(f2, rranges, full_output=True)
     # optParA = basinhopping(f1, (Aain, Kain))
