@@ -1,7 +1,7 @@
 import mpmath
 import numpy as np
 from sympy import *
-from scipy.optimize import root, newton, basinhopping, minimize, fsolve, brute
+from scipy.optimize import root, newton, basinhopping, minimize, fsolve, brute, differential_evolution
 import sympy as sym
 import math as mt
 import scipy
@@ -51,7 +51,8 @@ print("residue = ", residue)
 
 i = 0
 pp = []
-while abs(residue) > 1e-19:
+
+while abs(residue) > 1e-60:
     # ------- Optimizing som and soh2x taking into account condition sigmaCalc = sigmaM
     def optfunc(x):
 
@@ -69,13 +70,17 @@ while abs(residue) > 1e-19:
     residue1 = optConc[1] - optConc[0] - sigmaM
     print("new residue = ", residue1)
     print("optimized som ", optConc[0], "optimized soh2x ", optConc[1])
+
     pp.append(residue1)
     u = np.array(pp)
     residue = residue1
 
+
+
+
     # ------Estimate new Aa, Ka, Ab, Kb that agree with opimized som and soh2x
 
-    rranges1 = (slice(10, 3000, 10), slice(1e-12, 1e-5, 100), slice(10,3000,10), slice(1e-12,1e-5,100))
+    rranges1 = ([10, 3000], [1e-12, 1e-3], [10,1000], [1e-12,1e-3])
 
 
     def f1(z):
@@ -84,16 +89,6 @@ while abs(residue) > 1e-19:
         return eqAA
         # x[0]=Aa , x[1]=Ka
 
-
-
-    ### !!!!! --- Add boundaries
-    boundAa = (0, 3000)
-    boundKa = (1e-38, 1e-5)
-    boundAb = (0, 3000)
-    boundKb = (1e-38, 1e-5)
-
-    # optParA = minimize(f1, (Aain, Kain), method='Powell', bounds=(boundAa, boundKa))
-    # optParB = minimize(f2, (Abin, Kbin), method='Powell', bounds=(boundAb, boundKb))
 
     optParA = brute(f1, rranges1)
 
