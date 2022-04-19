@@ -76,14 +76,9 @@ while abs(residue) > 1e-19:
     # ------Estimate new Aa, Ka, Ab, Kb that agree with opimized som and soh2x
 
     def f1(z):
-        x,y = z
-        eqAA = abs((((optConc[0] * h) / ((n - optConc[0]) * M)) * np.exp(x * (optConc[0] / n)) - y))
+        x,y,a,b = z
+        eqAA = abs((((optConc[0] * h) / ((n - optConc[0]) * M)) * np.exp(x * (optConc[0] / n)) - y))+abs(((optConc[1] * oh) / ((n - optConc[1]) * An)) * np.exp((a * optConc[1]) / (n)) - b)
         return eqAA
-
-    def f2(z):
-        x,y=z
-        eqAB = abs(((optConc[1] * oh) / ((n - optConc[1]) * An)) * np.exp((x * optConc[1]) / (n)) - y)
-        return eqAB
 
         # x[0]=Aa , x[1]=Ka
 
@@ -97,16 +92,15 @@ while abs(residue) > 1e-19:
 
     # optParA = minimize(f1, (Aain, Kain), method='Powell', bounds=(boundAa, boundKa))
     # optParB = minimize(f2, (Abin, Kbin), method='Powell', bounds=(boundAb, boundKb))
-    rranges = (slice(1, 3000, 0.1), slice(1e-13, 1e-3, 1e-2))
+    rranges = (slice(1, 3000, 0.1), slice(1, 10, 0.1), slice(1,3000,0.1), slice(1,10,0.1))
     optParA = brute(f1, rranges, full_output=True)
-    optParB = brute(f2, rranges, full_output=True)
     # optParA = basinhopping(f1, (Aain, Kain))
     # rranges = (slice(0, 1000,1), slice(0, 1000,1))
-    print("new Aa = ", optParA[0], "new Ka = ", optParA[1], "new Ab = ", optParB[0], "new Kb = ", optParA[1])
+    print("new Aa = ", optParA[0], "new Ka = ", optParA[1], "new Ab = ", optParA[2], "new Kb = ", optParA[3])
     Aain = optParA[0]
     Kain = optParA[1]
-    Abin = optParB[0]
-    Kbin = optParB[1]
+    Abin = optParA[2]
+    Kbin = optParA[3]
 
     print ("residue = ", residue)
 
