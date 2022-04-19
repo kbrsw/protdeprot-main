@@ -73,42 +73,30 @@ while abs(residue) > 1e-19:
     u = np.array(pp)
     residue = residue1
 
+
     # ------Estimate new Aa, Ka, Ab, Kb that agree with opimized som and soh2x
 
     def f1(z):
-        eqAA = abs(((optConc[0] * h) / ((n - optConc[0]) * M)) * np.exp(z[0] * (optConc[0] / n)) - z[1])
+        eqAA = ((((optConc[0] * h) / ((n - optConc[0]) * M)) * np.exp(z[0] * (optConc[0] / n)) - z[1])+(((optConc[1] * oh) / ((n - optConc[1]) * An)) * np.exp((z[2] * optConc[1]) / (n)) - z[3]))**2
         # x[0]=Aa , x[1]=Ka
         return eqAA
 
 
     ### !!!!! --- Add boundaries
-    boundAa = (0, 30000000000)
-    boundKa = (1e-38, 1)
-    optParA = minimize(f1, (Aain, Kain), method='Powell', bounds=(boundAa,boundKa))
-    # optParA = basinhopping(f1, (Aain, Kain))
-    # rranges = (slice(0, 1000,1), slice(0, 1000,1))
-    # optParA = brute(f1, (Aain, Kain), rranges, full_output=True)
+    boundAa = (0, 3000)
+    boundKa = (1e-38, 1e-3)
+    boundAb = (0, 3000)
+    boundKb = (1e-38, 1e-3)
+
+    optParA = minimize(f1, (Aain, Kain, Abin, Kbin), method='Powell', bounds=(boundAa,boundKa, boundAb, boundKb))
+
     print("new Aa = ", optParA.x[0], "new Ka = ", optParA.x[1])
+    print("new Ab = ", optParA.x[2], "new Kb = ", optParA.x[3])
+
     Aain = optParA.x[0]
     Kain = optParA.x[1]
-
-
-    def f2(y):
-        eqAB = abs(((optConc[1] * oh) / ((n - optConc[1]) * An)) * np.exp((y[0] * optConc[1]) / (n)) - y[1])
-        # y[0] = Ab, y[1]=Kb
-        return eqAB
-
-
-    boundAb = (0, 30000000000)
-    boundKb = (1e-38, 1)
-    optParB = minimize(f2, (Abin, Kbin), method='Powell', bounds=(boundAb, boundKb))
-    # optParB = basinhopping(f2, (Abin, Kbin))
-    # rranges=(slice(0,1000,1),slice(0,1000,1))
-    # optParB = brute(f2, (Abin, Kbin), rranges, full_output=True)
-    print("new Ab = ", optParB.x[0], "new Kb = ", optParB.x[1])
-
-    Abin = optParB.x[0]
-    Kbin = optParB.x[1]
+    Abin = optParA.x[2]
+    Kbin = optParA.x[3]
 
     print ("residue = ", residue)
 
