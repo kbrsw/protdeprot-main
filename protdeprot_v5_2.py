@@ -57,7 +57,7 @@ while abs(residue) > 1e-20:
     # ------- Optimizing som and soh2x taking into account condition sigmaCalc = sigmaM
     def optfunc(x):
 
-        op1 = (solution2[0] - solution1[0] - x[1] + x[0])**2
+        op1 = abs(solution2[0] - solution1[0] - x[1] + x[0])
         op2 = (x[1] - x[0] - sigmaM)**2
         return (op1,op2)
 

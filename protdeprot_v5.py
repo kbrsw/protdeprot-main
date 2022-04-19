@@ -28,39 +28,40 @@ Kbin = 1e-6
 i = 0
 pp = []
 residue = 1
-x0 = (11,1e-6, 11,1e-6)
+x0 = (11,1e-6, 11, 1e-6)
+
+
+
+# -------find som and soh2x at initial Aa, Ka, Ab, Kb
+def eq1(x):
+    return ((x * h) / ((n - x) * M)) * np.exp(Aain * (x / n)) - Kain
+
+
+solution1 = fsolve(eq1, n)
+print("som initial =", solution1)
+
+
+def eq2(y):
+    return ((y * oh) / ((n - y) * An)) * np.exp((Abin * y) / (n)) - Kbin
+
+
+solution2 = fsolve(eq2, n)
+print("soh2x initial = ", solution2)
+
+# ---calculate sigmaCalc
+sigmaCalc = solution2 - solution1
+residue = sigmaCalc - sigmaM
+print("residue = ", residue)
+
 
 while abs(residue) > 1e-19:
-
-    # -------find som and soh2x at initial Aa, Ka, Ab, Kb
-    def eq1(x):
-        return ((x * h) / ((n - x) * M)) * np.exp(Aain * (x / n)) - Kain
-
-
-    solution1 = fsolve(eq1, n)
-    print("som initial =", solution1)
-
-
-    def eq2(y):
-        return ((y * oh) / ((n - y) * An)) * np.exp((Abin * y) / (n)) - Kbin
-
-
-    solution2 = fsolve(eq2, n)
-    print("soh2x initial = ", solution2)
-
-    # ---calculate sigmaCalc
-    sigmaCalc = solution2 - solution1
-    residue = sigmaCalc - sigmaM
-    print("residue = ", residue)
-
-
 
 
     # ------- Optimizing som and soh2x taking into account condition sigmaCalc = sigmaM
     def optfunc(x):
 
-        op1 = (solution2[0] - solution1[0] - x[1] + x[0])**2
-        op2 = (x[1] - x[0] - sigmaM)**2
+        op1 = abs(solution2[0] - solution1[0] - x[1] + x[0])
+        op2 = (x[1] - x[0] - sigmaM)
         return (op1,op2)
 
     bound1 = (1e-12,1)
@@ -81,18 +82,18 @@ while abs(residue) > 1e-19:
     # ------Estimate new Aa, Ka, Ab, Kb that agree with opimized som and soh2x
 
     def f1(z):
-        eqAA = ((((optConc[0] * h) / ((n - optConc[0]) * M)) * np.exp(z[0] * (optConc[0] / n)) - z[1])+(((optConc[1] * oh) / ((n - optConc[1]) * An)) * np.exp((z[2] * optConc[1]) / (n)) - z[3]))**2
+        eqAA = abs((((optConc[0] * h) / ((n - optConc[0]) * M)) * np.exp(z[0] * (optConc[0] / n)) - z[1])+(((optConc[1] * oh) / ((n - optConc[1]) * An)) * np.exp((z[2] * optConc[1]) / (n)) - z[3]))
         # x[0]=Aa , x[1]=Ka
         return eqAA
 
 
     ### !!!!! --- Add boundaries
-    # boundAa = (0, 3000)
-    # boundKa = (1e-38, 1e-3)
-    # boundAb = (0, 3000)
-    # boundKb = (1e-38, 1e-3)
+    boundAa = (0, 3000)
+    boundKa = (1e-38, 1e-3)
+    boundAb = (0, 3000)
+    boundKb = (1e-38, 1e-3)
 
-    optParA = minimize(f1, x0=x0, method='SLSQP')
+    optParA = minimize(f1, x0=x0, method='SLSQP', bounds=(boundAa, boundKa, boundAb, boundKb))
     x0 = (optParA.x[0], optParA.x[1], optParA.x[2], optParA.x[3])
 
     print("new Aa = ", optParA.x[0], "new Ka = ", optParA.x[1])
@@ -105,7 +106,7 @@ while abs(residue) > 1e-19:
 
     print ("residue = ", residue)
 
-    n= optConc[0]
+    n = optConc[0]
     solution1[0]=optConc[0]
     solution2[0]=optConc[1]
 

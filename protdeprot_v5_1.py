@@ -29,36 +29,36 @@ i = 0
 pp = []
 residue = 1
 
-while abs(residue) > 1e-60:
+
 
     # -------find som and soh2x at initial Aa, Ka, Ab, Kb
-    def eq1(x):
-        return ((x * h) / ((n - x) * M)) * np.exp(Aain * (x / n)) - Kain
+def eq1(x):
+    return ((x * h) / ((n - x) * M)) * np.exp(Aain * (x / n)) - Kain
 
 
-    solution1 = fsolve(eq1, n)
-    print("som initial =", solution1)
+solution1 = fsolve(eq1, n)
+print("som initial =", solution1)
 
 
-    def eq2(y):
-        return ((y * oh) / ((n - y) * An)) * np.exp((Abin * y) / (n)) - Kbin
+def eq2(y):
+    return ((y * oh) / ((n - y) * An)) * np.exp((Abin * y) / (n)) - Kbin
 
 
-    solution2 = fsolve(eq2, n)
-    print("soh2x initial = ", solution2)
+solution2 = fsolve(eq2, n)
+print("soh2x initial = ", solution2)
 
-    # ---calculate sigmaCalc
-    sigmaCalc = solution2 - solution1
-    residue = sigmaCalc - sigmaM
-    print("residue = ", residue)
+# ---calculate sigmaCalc
+sigmaCalc = solution2 - solution1
+residue = sigmaCalc - sigmaM
+print("residue = ", residue)
 
-
+while abs(residue) > 1e-60:
     # ------- Optimizing som and soh2x taking into account condition sigmaCalc = sigmaM
     def optfunc(x):
 
-        op1 = (solution2[0] - solution1[0] - x[1] + x[0])**2
-        op2 = (x[1] - x[0] - sigmaM)**2
-        return (op1,op2)
+        op1 = abs(solution2[0] - solution1[0] - x[1] + x[0])
+        op2 = (x[1] - x[0] - sigmaM)
+        return (op1, op2)
 
     bound1 = (1e-12,1)
     bound2 = (1e-12,1)
@@ -85,7 +85,7 @@ while abs(residue) > 1e-60:
 
     def f1(z):
         x,y,a,b = z
-        eqAA = abs(((optConc[0] * h) / ((n - optConc[0]) * M)) * np.exp(x * (optConc[0] / n)) - y) + abs(((optConc[1] * oh) / ((n - optConc[1]) * An)) * np.exp((a * optConc[1]) / (n)) - b)
+        eqAA = abs(((optConc[0] * h) / ((n - optConc[0]) * M)) * np.exp(x * (optConc[0] / n)) - y + ((optConc[1] * oh) / ((n - optConc[1]) * An)) * np.exp((a * optConc[1]) / (n)) - b)
         return eqAA
         # x[0]=Aa , x[1]=Ka
 
