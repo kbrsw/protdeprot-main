@@ -7,6 +7,6 @@ def f1(z):
     return np.sin(2 / x + y)
 
 
-rranges = (slice(0, 10, 1), slice(0, 10, 1))
+rranges = (slice(1, 10, 1), slice(1, 10, 1))
 optParA = brute(f1, rranges, full_output=True)
 print(" x = ", optParA[0], "y = ", optParA[1])
