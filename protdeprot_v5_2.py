@@ -1,7 +1,7 @@
 import mpmath
 import numpy as np
 from sympy import *
-from scipy.optimize import root, newton, basinhopping, minimize, fsolve, brute, differential_evolution
+from scipy.optimize import root, newton, basinhopping, minimize, fsolve, brute, differential_evolution, shgo
 import sympy as sym
 import math as mt
 import scipy
@@ -27,9 +27,11 @@ Kbin = 1e-6
 
 i = 0
 pp = []
-residue = 1
 
-while abs(residue) > 1e-60:
+residue = 1
+x0 = (11,1e-6)
+y0 = (11,1e-6)
+while abs(residue) > 1e-20:
 
     # -------find som and soh2x at initial Aa, Ka, Ab, Kb
     def eq1(x):
@@ -51,7 +53,6 @@ while abs(residue) > 1e-60:
     sigmaCalc = solution2 - solution1
     residue = sigmaCalc - sigmaM
     print("residue = ", residue)
-
 
     # ------- Optimizing som and soh2x taking into account condition sigmaCalc = sigmaM
     def optfunc(x):
@@ -75,30 +76,42 @@ while abs(residue) > 1e-60:
     u = np.array(pp)
     residue = residue1
 
-
-
-
     # ------Estimate new Aa, Ka, Ab, Kb that agree with opimized som and soh2x
 
     rranges1 = ([10, 3000], [1e-12, 1e-3], [10,1000], [1e-12,1e-3])
+    boundAa = (10,3000)
+    boundKa = (1e-16, 1e-3)
+    boundAb = (10, 3000)
+    boundKb = (1e-16, 1e-3)
+
+    Kain = 1e-6
+    Kbin = 1e-6
 
 
-    def f1(z):
-        x,y,a,b = z
-        eqAA = abs(((optConc[0] * h) / ((n - optConc[0]) * M)) * np.exp(x * (optConc[0] / n)) - y) + abs(((optConc[1] * oh) / ((n - optConc[1]) * An)) * np.exp((a * optConc[1]) / (n)) - b)
+    def f1(x):
+        eqAA = (((optConc[0] * h) / ((n - optConc[0]) * M)) * np.exp(x[0] * (optConc[0] / n)) - x[1])
+
         return eqAA
-        # x[0]=Aa , x[1]=Ka
+       # x[0]=Aa , x[1]=Ka
 
+    optParA = minimize(f1, x0=x0, bounds=(boundAa, boundKa))
 
-    optParA = brute(f1, rranges1)
+    def f2(x):
+        eqAB = (((optConc[1] * oh) / ((n - optConc[1]) * An)) * np.exp((x[0] * optConc[1]) / (n)) - x[1])
+        return  eqAB
+
+    optParB = minimize(f2, x0 = y0, bounds=(boundAb, boundKb))
+
+    x0 = (optParA.x[0], optParA.x[1])
+    y0 = (optParB.x[0], optParB.x[1])
 
     # optParA = basinhopping(f1, (Aain, Kain))
     # rranges = (slice(0, 1000,1), slice(0, 1000,1))
-    print("new Aa = ", optParA[0], "new Ka = ", optParA[1], "new Ab = ", optParA[2], "new Kb = ", optParA[3])
-    Aain = optParA[0]
-    Kain = optParA[1]
-    Abin = optParA[2]
-    Kbin = optParA[3]
+    print("new Aa = ", optParA.x[0], "new Ka = ", optParA.x[1], "new Ab = ", optParB.x[0], "new Kb = ", optParB.x[1])
+    Aain = optParA.x[0]
+    Kain = optParA.x[1]
+    Abin = optParB.x[0]
+    Kbin = optParB.x[1]
 
     print ("residue = ", residue)
 
