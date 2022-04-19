@@ -75,7 +75,7 @@ while abs(residue) > 1e-19:
 
     # ------Estimate new Aa, Ka, Ab, Kb that agree with opimized som and soh2x
 
-    rranges1 = (slice(10, 3000, 10), slice(1e-15, 1e-5, 100), slice(10,3000,10), slice(1e-15,1e-5,100))
+    rranges1 = (slice(10, 3000, 10), slice(1e-12, 1e-5, 100), slice(10,3000,10), slice(1e-12,1e-5,100))
 
 
     def f1(z):
