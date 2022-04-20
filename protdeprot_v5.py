@@ -20,17 +20,17 @@ n = Ns / 2
 # Abin = 10 ** (3.8)
 # Kain = 1e-4
 # Kbin = 1.99e-10
-Aain = 11
-Abin = 11
+Aain = 20
+Abin = 3500
 Kain = 1e-6
-Kbin = 1e-6
+Kbin = 1e-15
+
 
 i = 0
-pp = []
 residue = 1
 x0 = (11,1e-6, 11, 1e-6)
-
-
+pp1 = []
+pp2 = []
 
 # -------find som and soh2x at initial Aa, Ka, Ab, Kb
 def eq1(x):
@@ -53,10 +53,7 @@ sigmaCalc = solution2 - solution1
 residue = sigmaCalc - sigmaM
 print("residue = ", residue)
 
-
-while abs(residue) > 1e-19:
-
-
+while abs(residue) > 1e-12:
     # ------- Optimizing som and soh2x taking into account condition sigmaCalc = sigmaM
     def optfunc(x):
 
@@ -70,13 +67,16 @@ while abs(residue) > 1e-19:
     optConc = fsolve(optfunc, (solution1[0], solution2[0]))
 
 
+
     # residue1 = optConc.x[1] - optConc.x[0] - sigmaM
-    residue1 = optConc[1] - optConc[0] - sigmaM
-    print("new residue = ", residue1)
+    residue = optConc[1] - optConc[0] - sigmaM
+    pp1.append(optConc[1])
+    pp2.append(optConc[0])
+    print("new residue = ", residue)
     print("optimized som ", optConc[0], "optimized soh2x ", optConc[1])
-    pp.append(residue1)
-    u = np.array(pp)
-    residue = residue1
+
+
+    # residue = residue1
 
 
     # ------Estimate new Aa, Ka, Ab, Kb that agree with opimized som and soh2x
@@ -88,12 +88,12 @@ while abs(residue) > 1e-19:
 
 
     ### !!!!! --- Add boundaries
-    boundAa = (0, 3000)
-    boundKa = (1e-38, 1e-3)
-    boundAb = (0, 3000)
-    boundKb = (1e-38, 1e-3)
+    boundAa = (10, 44)
+    boundKa = (2.5e-11, 1.05e-4)
+    boundAb = (1, 7944)
+    boundKb = (1e-27, 1.26e-6)
 
-    optParA = minimize(f1, x0=x0, method='SLSQP', bounds=(boundAa, boundKa, boundAb, boundKb))
+    optParA = minimize(f1, x0=x0, method='Powell', bounds=(boundAa, boundKa, boundAb, boundKb))
     x0 = (optParA.x[0], optParA.x[1], optParA.x[2], optParA.x[3])
 
     print("new Aa = ", optParA.x[0], "new Ka = ", optParA.x[1])
@@ -104,10 +104,17 @@ while abs(residue) > 1e-19:
     Abin = optParA.x[2]
     Kbin = optParA.x[3]
 
-    print ("residue = ", residue)
+    u = np.array(pp1)
+    v = np.array(pp2)
 
     n = optConc[0]
     solution1[0]=optConc[0]
     solution2[0]=optConc[1]
 
+
     i += 1
+
+
+
+
+
