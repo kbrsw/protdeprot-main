@@ -1,4 +1,4 @@
-from scipy.optimize import minimize
+from scipy.optimize import minimize, brute, differential_evolution
 
 def function(a):
     x,y,z = a
@@ -9,8 +9,11 @@ boundx = (0,3)
 boundy = (0,3)
 boundz = (0,3)
 
-# opt = minimize(function, (0,0), method = 'SLSQP', bounds=(boundx, boundy))
+bounds = (slice(0,3,0.1), slice(0,3,0.1), slice(0,3,0.1))
+
 opt = minimize(function, (0,0,0), bounds=(boundx, boundy, boundz))
+# opt = brute(function, bounds)
+# opt = differential_evolution(function, [(0,3),(0,3),(0,3)])
 print("x = ", opt.x[0])
 print("y = ", opt.x[1])
 print("z = ", opt.x[2])
