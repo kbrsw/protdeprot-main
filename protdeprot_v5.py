@@ -15,11 +15,7 @@ h = 10 ** (-pH)
 oh = (1e-14) / h
 n = Ns / 2
 
-# Initial assumptions for constants
-# Aain = 10 ** (1.1)
-# Abin = 10 ** (3.8)
-# Kain = 1e-4
-# Kbin = 1.99e-10
+# Initial guess for constants
 Aain = 20
 Abin = 3500
 Kain = 1e-6
@@ -108,6 +104,7 @@ while abs(residue) > 1e-12:
     boundKb = (1e-27, 1.26e-6)
 
     optParA = minimize(f1, x0=x0, method='Powell', bounds=(boundAa, boundKa, boundAb, boundKb))
+    # optParA = minimize(f1, x0=x0, method = 'SLSQP', bounds=(boundAa, boundKa, boundAb, boundKb))
     x0 = (optParA.x[0], optParA.x[1], optParA.x[2], optParA.x[3])
 
     print("new Aa = ", optParA.x[0], "new Ka = ", optParA.x[1])
